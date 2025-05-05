@@ -46,37 +46,43 @@ async function getSpotifyAccessToken() {
 }
 
 app.get("/", async (req, res) => {
-    const token = await getSpotifyAccessToken();
+    try {
+        const token = await getSpotifyAccessToken();
 
-    const response = await fetch(
-        "https://api.spotify.com/v1/artists/06HL4z0CvFAxyc27GXpf02/top-tracks?market=US",
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(
+            "https://api.spotify.com/v1/search?q=Taylor+Swift&type=track&limit=50",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        // Log the API response for debugging
+        console.log("API Response:", data);
+
+        if (!data.tracks || !data.tracks.items || data.tracks.items.length === 0) {
+            throw new Error("No tracks found for Taylor Swift.");
         }
-    );
 
-    const data = await response.json();
-    const songs = data.tracks.items.filter(songs => songs.preview_url);
+        const songs = data.tracks.items.filter(song => song.preview_url);
+        if (songs.length === 0) {
+            throw new Error("No songs with previews found.");
+        }
 
-    console.log("API Response Items:", data.tracks.items);
+        const randomSong = songs[Math.floor(Math.random() * songs.length)];
 
-    if (!songs.length) {
-        return res.send("No songs with previews found.");
+        res.render("index", {
+            name: randomSong.name,
+            artist: randomSong.artists[0].name,
+            preview_url: randomSong.preview_url,
+        });
+    } catch (error) {
+        console.error("Error:", error);  // Log the error to the console
+        res.status(500).send("An error occurred while fetching the song data.");
     }
-    
-    const randomizeSongs = songs[Math.floor(Math.random()*songs.length)];
-
-    if (!randomSong || !randomSong.name || !randomSong.artists || !randomSong.preview_url) {
-        return res.send("Random song is missing data.");
-    }
-    
-    res.render("index", {
-        name: randomizeSongs.name,
-        artist: randomizeSongs.artists[0].name,
-        preview_url: randomizeSongs.preview_url
-    });
 });
 
 app.listen(portNumber, () => {
