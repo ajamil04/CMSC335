@@ -1,0 +1,21 @@
+/* .im-fell-dw-pica-regular {
+    font-family: "IM Fell DW Pica", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .im-fell-dw-pica-regular-italic {
+    font-family: "IM Fell DW Pica", serif;
+    font-weight: 400;
+    font-style: italic;
+  }   */
+
+html {
+    background-color: azure;
+}
+
+h1 {
+    font-family: "IM Fell DW Pica", serif; 
+    font-style: italic;
+    text-align: center;
+}
