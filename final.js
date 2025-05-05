@@ -1,6 +1,6 @@
 const path = require("path");
 // const http = require("http");
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 const express = require("express");
 
 require("dotenv").config({
@@ -43,7 +43,7 @@ async function getSpotifyAccessToken() {
     }
 
     console.log("Spotify Access Token:", data.access_token);
-    
+
     return data.access_token;
 }
 
