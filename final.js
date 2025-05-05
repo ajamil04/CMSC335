@@ -94,24 +94,24 @@ async function getArtist(name, token) {
     
         const albumsData = await albumsResponse.json();
     
-        const similarArtistsResponse = await fetch(
-            `https://api.spotify.com/v1/artists/${artist.id}/related-artists`,
-            {
-                headers: { Authorization: `Bearer ${token}`},
-            }
-        );
+        // const similarArtistsResponse = await fetch(
+        //     `https://api.spotify.com/v1/artists/${artist.id}/related-artists`,
+        //     {
+        //         headers: { Authorization: `Bearer ${token}`},
+        //     }
+        // );
     
-        if (!similarArtistsResponse.ok) {
-            throw new Error(`Similar artists API error: ${similarArtistsResponse.statusText}`);
-        }
+        // if (!similarArtistsResponse.ok) {
+        //     throw new Error(`Similar artists API error: ${similarArtistsResponse.statusText}`);
+        // }
     
-        const similarArtistsData = await similarArtistsResponse.json();
+        // const similarArtistsData = await similarArtistsResponse.json();
     
         return {
             name: artist.name,
             topTracks: topTracksData.tracks,
             albums: albumsData.items,
-            similarArtists: similarArtistsData.artists,
+            // similarArtists: similarArtistsData.artists,
         };
     } catch (error) {
         console.error("Error fetching artist data:", error); 
