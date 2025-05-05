@@ -49,7 +49,7 @@ app.get("/", async (req, res) => {
     const token = await getSpotifyAccessToken();
 
     const response = await fetch(
-        `https://api.spotify.com/v1/search?q=artist:taylor+swift&type=track&limit=50`,
+        "https://api.spotify.com/v1/search?q=artist:Taylor%20Swift&type=track&limit=50",
         {
             headers: {
                 Authorization: `Bearer ${token}`,
