@@ -50,7 +50,7 @@ async function getSpotifyAccessToken() {
 async function getArtist(name, token) {
     try {
         const artistResponse = await fetch(
-            `https://api.spotify.com/v1/search?q=artist:${artistName}&type=artist`,
+            `https://api.spotify.com/v1/search?q=artist:${name}&type=artist`,
             {
                 headers: { Authorization: `Bearer ${token}`},
             }
@@ -110,7 +110,7 @@ async function getArtist(name, token) {
         return {
             name: artist.name,
             topTracks: topTracksData.tracks,
-            albums: albumsData.albums,
+            albums: albumsData.items,
             similarArtists: similarArtistsData.artists,
         };
     } catch (error) {
