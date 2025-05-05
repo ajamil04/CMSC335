@@ -19,7 +19,9 @@ const finalProjectServer = http.createServer((request, response) => {
 });
 
 app.set("view engine", "ejs");
-app.set("views", path.resolve(__dirname, "public"));
+app.set("views", path.resolve(__dirname, "templates"));
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use(express.urlencoded({extended:false}));
 
