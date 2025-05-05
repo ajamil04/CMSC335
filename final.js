@@ -45,11 +45,7 @@ async function getSpotifyAccessToken() {
     return data.access_token;
 }
 
-app.get("/", (req, res) => {
-    res.render("index");
-})
-
-app.get("/songPreviews", async (req, res) => {
+app.get("/", async (req, res) => {
     const token = await getSpotifyAccessToken();
 
     const response = await fetch(
@@ -66,7 +62,7 @@ app.get("/songPreviews", async (req, res) => {
 
     const randomizeSongs = songs[Math.floor(Math.random()*songs.length)];
 
-    res.json( {
+    res.render("index", {
         name: randomizeSongs.name,
         artist: randomizeSongs.artists[0].name,
         preview_url: randomizeSongs.preview_url
