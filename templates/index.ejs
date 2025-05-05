@@ -19,7 +19,32 @@
 
     <form action="/" method="post">
         <label for="name">Enter an artist's name:</label>
+        <input type="text" id="name" required>
+        <button type="submit">Search Artist</button>
     </form>
     
+    <% if (artistData) { %>
+        <h2>Top Tracks for <%= artistData.name %></h2>
+        <ul>
+            <% artistData.topTracks.forEach(track => { %>
+                <li><%= track.name %> - <%= track.album.name %></li>
+            <% }) %>
+        </ul>
+
+        <h2>Albums by <%= artistData.name %></h2>
+        <ul>
+            <% artistData.albums.forEach(album => { %>
+                <li><%= album.name %> - <%= album.release_date %></li>
+            <% }) %>
+        </ul>
+
+        <h2>Similar Artists</h2>
+        <ul>
+            <% artistData.similarArtists.forEach(artist => { %>
+                <li><%= artist.name %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+
 </body>
 </html>
