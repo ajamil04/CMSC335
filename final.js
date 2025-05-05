@@ -49,7 +49,7 @@ app.get("/", async (req, res) => {
     const token = await getSpotifyAccessToken();
 
     const response = await fetch(
-        "https://api.spotify.com/v1/search?q=artist:Taylor%20Swift&type=track&limit=50",
+        "https://api.spotify.com/v1/artists/06HL4z0CvFAxyc27GXpf02/top-tracks?market=US",
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -60,8 +60,18 @@ app.get("/", async (req, res) => {
     const data = await response.json();
     const songs = data.tracks.items.filter(songs => songs.preview_url);
 
+    console.log("API Response Items:", data.tracks.items);
+
+    if (!songs.length) {
+        return res.send("No songs with previews found.");
+    }
+    
     const randomizeSongs = songs[Math.floor(Math.random()*songs.length)];
 
+    if (!randomSong || !randomSong.name || !randomSong.artists || !randomSong.preview_url) {
+        return res.send("Random song is missing data.");
+    }
+    
     res.render("index", {
         name: randomizeSongs.name,
         artist: randomizeSongs.artists[0].name,
