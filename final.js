@@ -99,6 +99,10 @@ async function storeSearchData(name) {
     } 
 }
 
+app.get("/", (req, res) => {
+    res.render("index");
+})
+
 app.post("/", async (req, res) => {
     try {
         const name = req.body.name;
