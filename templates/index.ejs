@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess the Song! (Taylor's Version)</title>
+    <title>Spotify Artist Data Search</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,16 +15,11 @@
 </head>
 
 <body>
-    <h1>Guess the Song! (Taylor's Version)</h1>
+    <h1>Spotify Artist Data Search</h1>
 
-    <div id="song">
-        <h2>Now Playing!</h2>
-        <h2>By: Taylor Swift</h2>
-    </div>
-
-    <audio>
-        <source src="<%= preview_url %>" type="audio/mpeg">
-    </audio>
+    <form action="/" method="post">
+        <label for="name">Enter an artist's name:</label>
+    </form>
     
 </body>
 </html>

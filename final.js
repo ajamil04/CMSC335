@@ -1,6 +1,6 @@
 const path = require("path");
-const http = require("http");
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// const http = require("http");
+const fetch = require("node-fetch");
 const express = require("express");
 
 require("dotenv").config({
@@ -12,12 +12,6 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 
 const app = express();
 const portNumber = process.env.PORT;
-
-// const httpSuccessStatus = 200;
-// const finalProjectServer = http.createServer((request, response) => {
-//     response.writeHead(httpSuccessStatus, {'Content-type':'text/html'});
-//     response.end();
-// });
 
 app.set("view engine", "ejs");
 app.set("views", path.resolve(__dirname, "templates"));
@@ -45,40 +39,75 @@ async function getSpotifyAccessToken() {
     return data.access_token;
 }
 
-app.get("/", async (req, res) => {
+async function getArtist(name, token) {
+    const artistResponse = await fetch(
+        `https://api.spotify.com/v1/search?q=artist:${artistName}&type=artist`,
+        {
+            headers: { Authorization: `Bearer ${token}`},
+        }
+    );
+    const artistData = await artistResponse.json();
+    const artist = artistData.artists.items[0];
+
+    const topTracksResponse = await fetch(
+        `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?country=US`,
+        {
+            headers: { Authorization: `Bearer ${token}`},
+        }
+    );
+    const topTracksData = await topTracksResponse.json();
+
+    const albumsResponse = await fetch(
+        `https://api.spotify.com/v1/artists/${artist.id}/albums`,
+        {
+            headers: { Authorization: `Bearer ${token}`},
+        }
+    );
+    const albumsData = await albumsResponse.json();
+
+    const similarArtistsResponse = await fetch(
+        `https://api.spotify.com/v1/artists/${artist.id}/related-artists`,
+        {
+            headers: { Authorization: `Bearer ${token}`},
+        }
+    );
+    const similarArtistsData = await similarArtistsResponse.json();
+
+    return {
+        name: artist.name,
+        topTracks: topTracksData.tracks,
+        albums: albumsData.albums,
+        similarArtists: similarArtistsData.artists,
+    };
+}
+
+async function storeSearchData(name) {
+    const uri = process.env.MONGO_DB_PASSWORD;
+    const client = new MongoClient(uri, { serverApi: ServerApiVersion.v1 });
+
+    try {        
+        await client.connect();
+
+        const result = await client.db(databaseAndCollection.db)
+        .collection(databaseAndCollection.collection);
+
+        await collection.insertOne({name});
+    } catch (e) {
+        console.error(e);
+    } finally {
+        await client.close();
+    } 
+}
+
+app.post("/", async (req, res) => {
     try {
+        const name = req.body.name;
         const token = await getSpotifyAccessToken();
+        const artistData = await getArtist(name, token);
 
-        const response = await fetch(
-            "https://api.spotify.com/v1/search?q=Taylor+Swift&type=track&limit=50",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        await storeSearchData(name);
 
-        const data = await response.json();
-
-        // Log the API response for debugging
-        console.log("API Response:", data);
-
-        if (!data.tracks || !data.tracks.items || data.tracks.items.length === 0) {
-            throw new Error("No tracks found for Taylor Swift.");
-        }
-
-        const songs = data.tracks.items.filter(song => song.preview_url);
-        if (songs.length === 0) {
-            throw new Error("No songs with previews found.");
-        }
-
-        const randomSong = songs[Math.floor(Math.random() * songs.length)];
-
-        res.render("index", {
-            name: randomSong.name,
-            artist: randomSong.artists[0].name,
-            preview_url: randomSong.preview_url,
-        });
+        res.render("index", {artistData});
     } catch (error) {
         console.error("Error:", error);  // Log the error to the console
         res.status(500).send("An error occurred while fetching the song data.");
