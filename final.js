@@ -13,11 +13,11 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = express();
 const portNumber = process.env.PORT;
 
-const httpSuccessStatus = 200;
-const finalProjectServer = http.createServer((request, response) => {
-    response.writeHead(httpSuccessStatus, {'Content-type':'text/html'});
-    response.end();
-});
+// const httpSuccessStatus = 200;
+// const finalProjectServer = http.createServer((request, response) => {
+//     response.writeHead(httpSuccessStatus, {'Content-type':'text/html'});
+//     response.end();
+// });
 
 app.set("view engine", "ejs");
 app.set("views", path.resolve(__dirname, "templates"));
@@ -26,19 +26,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.urlencoded({extended:false}));
 
-
-
 async function getSpotifyAccessToken() {
     const clientId = process.env.SPOTIFY_CLIENT_ID;
-    const clientSecret = process.envSPOTIFY_CLIENT_SECRET;
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    const creds = Buffer.from(`${clientId}:${clientSecret}`).toString();
+    const creds = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     
     const response = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
         headers: {
-            Authorization: `Basic ${credentials}`
-        }
+            Authorization: `Basic ${creds}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "grant_type=client_credentials",
     });
 
     const data = await response.json();
@@ -62,25 +62,15 @@ app.get("/songPreviews", async (req, res) => {
     );
 
     const data = await response.json();
-    const songs = data.songs.items.filter(songs => songs.preview_url);
+    const songs = data.tracks.items.filter(songs => songs.preview_url);
 
-    const randomizeSongs = songs[Math.random()*songs.length];
+    const randomizeSongs = songs[Math.floor(Math.random()*songs.length)];
 
     res.json( {
         name: randomizeSongs.name,
         artist: randomizeSongs.artists[0].name,
         preview_url: randomizeSongs.preview_url
     });
-});
-
-window.addEventListener("DOMContentLoaded", async() => {
-    const response = await fetch("/songPreviews");
-    const data = await response.json();
-
-    const audio = new Audio(data.preview_url);
-    audio.play();
-
-    document.body.innerHTML += `<p>Now playing: <strong>${data.name}</strong> by ${data.artist}</p>`;
 });
 
 app.listen(portNumber, () => {
