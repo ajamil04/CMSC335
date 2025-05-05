@@ -88,10 +88,9 @@ async function storeSearchData(name) {
     try {        
         await client.connect();
 
-        const result = await client.db(databaseAndCollection.db)
-        .collection(databaseAndCollection.collection);
-
-        await collection.insertOne({name});
+        await client.db(databaseAndCollection.db)
+            .collection(databaseAndCollection.collection)
+            .insertOne({name});
     } catch (e) {
         console.error(e);
     } finally {
@@ -100,7 +99,7 @@ async function storeSearchData(name) {
 }
 
 app.get("/", (req, res) => {
-    res.render("index");
+    res.render("index", { artistData: null });
 })
 
 app.post("/", async (req, res) => {
